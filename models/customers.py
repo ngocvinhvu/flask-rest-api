@@ -14,8 +14,11 @@ class CustomerModel(db.Model):
     state = db.Column(db.VARCHAR(50), nullable=True)
     postalCode = db.Column(db.VARCHAR(15), nullable=True)
     country = db.Column(db.VARCHAR(50), nullable=False)
-    salesRepEmployeeNumber = db.Column(db.Integer, index=True, nullable=True)
+    salesRepEmployeeNumber = db.Column(db.Integer, index=True, nullable=True, db.ForeignKey('employees.employeeNumber'))
     creditLimit = db.Column(db.DECIMAL(10, 2), nullable=True)
+
+    order = db.relationship('orderModel')
+    payment = db.relationship('paymentModel')
 
     def __init__(self,
              customerNumber,

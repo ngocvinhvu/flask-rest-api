@@ -8,9 +8,11 @@ class EmployeeModel(db.Model):
     firstName = db.Column(db.VARCHAR(50), nullable=False)
     extension = db.Column(db.VARCHAR(10), nullable=False)
     email = db.Column(db.VARCHAR(100), nullable=False)
-    officeCode = db.Column(db.VARCHAR(10), index=True, nullable=False)
-    reportsTo = db.Column(db.Integer, nullable=True, index=True)
+    officeCode = db.Column(db.VARCHAR(10), index=True, nullable=False, db.ForeignKey('offices.officeCode'))
+    reportsTo = db.Column(db.Integer, nullable=True, index=True, db.ForeignKey('employees.employeeNumber'))
     jobTitle = db.Column(db.VARCHAR(50), nullable=False)
+
+    employee = db.relationship('EmployeeModel', lazy='dynamic')
 
     def __init__(self,
              employeeNumber,

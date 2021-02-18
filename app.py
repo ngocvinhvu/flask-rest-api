@@ -25,7 +25,7 @@ api.add_resource(EmployeeList, '/employees')
 api.add_resource(Offices, '/office/<int:officeCode>')
 api.add_resource(OfficeList, '/offices')
 
-api.add_resource(Orderdetails, '/orderdetail/<int:orderdetailkey>')
+api.add_resource(Orderdetails, '/orderdetail/<string:orderdetailkey>')
 api.add_resource(OrderdetailList, '/orderdetails')
 
 api.add_resource(Orders, '/order/<int:orderNumber>')
@@ -34,10 +34,10 @@ api.add_resource(OrderList, '/orders')
 api.add_resource(Payments, '/payment/<int:customerNumber>')
 api.add_resource(PaymentList, '/payments')
 
-api.add_resource(Productlines, '/productline/<int:productLine>')
+api.add_resource(Productlines, '/productline/<string:productLine>')
 api.add_resource(ProductlineList, '/productlines')
 
-api.add_resource(Products, '/product/<int:productCode>')
+api.add_resource(Products, '/product/<string:productCode>')
 api.add_resource(ProductList, '/products')
 
 if __name__ == '__main__':

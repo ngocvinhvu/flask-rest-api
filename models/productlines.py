@@ -8,6 +8,8 @@ class ProductlineModel(db.Model):
     htmlDescription = db.Column(db.Text, nullable=True)
     image = db.Column(db.Text, nullable=True)
 
+    product = db.relationship('productModel', lazy='dynamic')
+
     def __init__(self,
              productLine,
              textDescription,

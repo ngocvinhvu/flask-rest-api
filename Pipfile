@@ -9,6 +9,7 @@ Flask-JWT = "*"
 Flask-RESTful = "*"
 Flask-SQLAlchemy = "*"
 pymysql = "*"
+cryptography = "*"
 
 [dev-packages]
 

@@ -9,7 +9,9 @@ class OrderModel(db.Model):
     shippedDate = db.Column(db.Date, nullable=True)
     status = db.Column(db.VARCHAR(15), nullable=False)
     comments = db.Column(db.Text, nullable=True)
-    customerNumber = db.Column(db.Integer, index=True, nullable=False)
+    customerNumber = db.Column(db.Integer, index=True, nullable=False, db.ForeignKey('customers.customerNumber'))
+
+    orderdetail = db.relationship('orderdetailModel', lazy='dynamic')
 
     def __init__(self,
              orderNumber,

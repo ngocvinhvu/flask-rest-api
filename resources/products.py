@@ -54,6 +54,7 @@ class Products(Resource):
                         )
 
     def get(self, productCode):
+        print(productCode)
         product = ProductModel.find_by_productCode(productCode)
         if product:
             return product.json()
