@@ -5,7 +5,7 @@ class ProductModel(db.Model):
     __tablename__ = 'products'
     productCode = db.Column(db.VARCHAR(15), primary_key=True, nullable=False)
     productName = db.Column(db.VARCHAR(70), nullable=False)
-    productLine = db.Column(db.VARCHAR(50), nullable=False, index=True, db.ForeignKey('productlines.productLine'))
+    productLine = db.Column(db.VARCHAR(50), db.ForeignKey('productlines.productLine'), nullable=False, index=True)
     productScale = db.Column(db.VARCHAR(10), nullable=False)
     productVendor = db.Column(db.VARCHAR(50), nullable=False)
     productDescription = db.Column(db.Text, nullable=False)
@@ -13,7 +13,7 @@ class ProductModel(db.Model):
     buyPrice = db.Column(db.DECIMAL(10, 2), nullable=False)
     MSRP = db.Column(db.DECIMAL(10, 2), nullable=False)
 
-    orderdetail = db.relationship('orderdetailModel', lazy='dynamic')
+    orderdetail = db.relationship('OrderdetailModel', lazy='dynamic')
 
     def __init__(self,
              productCode,

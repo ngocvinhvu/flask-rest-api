@@ -14,27 +14,29 @@ class CustomerModel(db.Model):
     state = db.Column(db.VARCHAR(50), nullable=True)
     postalCode = db.Column(db.VARCHAR(15), nullable=True)
     country = db.Column(db.VARCHAR(50), nullable=False)
-    salesRepEmployeeNumber = db.Column(db.Integer, index=True, nullable=True, db.ForeignKey('employees.employeeNumber'))
+    salesRepEmployeeNumber = db.Column(db.Integer, db.ForeignKey('employees.employeeNumber'), index=True, nullable=True)
     creditLimit = db.Column(db.DECIMAL(10, 2), nullable=True)
 
-    order = db.relationship('orderModel')
-    payment = db.relationship('paymentModel')
+    order = db.relationship('OrderModel', lazy='dynamic')
+    payment = db.relationship('PaymentModel', backref="cycles",
+                              cascade="save-update, merge, "
+                                      "delete, delete-orphan")
 
     def __init__(self,
-             customerNumber,
-             customerName,
-             contactLastName,
-             contactFirstName,
-             phone,
-             addressLine1,
-             addressLine2,
-             city,
-             state,
-             postalCode,
-             country,
-             salesRepEmployeeNumber,
-             creditLimit,
-             ):
+                 customerNumber,
+                 customerName,
+                 contactLastName,
+                 contactFirstName,
+                 phone,
+                 addressLine1,
+                 addressLine2,
+                 city,
+                 state,
+                 postalCode,
+                 country,
+                 salesRepEmployeeNumber,
+                 creditLimit,
+                 ):
         self.customerNumber = customerNumber
         self.customerName = customerName
         self.contactLastName = contactLastName
@@ -73,11 +75,9 @@ class CustomerModel(db.Model):
         ).first()
 
     def save_to_db(self):
-
         db.session.add(self)
         db.session.commit()
 
     def delete_from_db(self):
-
         db.session.delete(self)
         db.session.commit()
