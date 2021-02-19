@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.employees import EmployeeModel
+from flask import request, current_app, jsonify, url_for
 
 
 class Employees(Resource):
@@ -73,33 +74,6 @@ class Employees(Resource):
             return {'message': 'employee deleted'}
         return {'message': 'Item not found.'}, 404
 
-    def patch(self, employeeNumber):
-        data = Employees.parser.parse_args()
-
-        employee = EmployeeModel.find_by_employeeNumber(employeeNumber)
-
-        if employee is None:
-            return {'message': 'Employee not found.'}, 404
-        else:
-            if 'lastName' in data and employee.lastName != data['lastName']:
-                employee.lastName = data['lastName']
-            if 'firstName' in data and employee.firstName != data['firstName']:
-                employee.firstName = data['firstName']
-            if 'extension' in data and employee.extension != data['extension']:
-                employee.extension = data['extension']
-            if 'email' in data and employee.email != data['email']:
-                employee.email = data['email']
-            if 'officeCode' in data and employee.officeCode != data['officeCode']:
-                employee.officeCode = data['officeCode']
-            if 'reportsTo' in data and employee.reportsTo != data['reportsTo']:
-                employee.reportsTo = data['reportsTo']
-            if 'jobTitle' in data and employee.jobTitle != data['jobTitle']:
-                employee.jobTitle = data['jobTitle']
-
-        employee.save_to_db()
-
-        return {"message": "employee updated successful."}
-
     def put(self, employeeNumber):
         data = Employees.parser.parse_args()
 
@@ -118,4 +92,21 @@ class Employees(Resource):
 
 class EmployeeList(Resource):
     def get(self):
-        return {'employees': [employee.json() for employee in EmployeeModel.query.all()]}
+        page = request.args.get('page', 1, type=int)
+        pagination = EmployeeModel.query.paginate(
+            page, per_page=current_app.config['REST_POSTS_PER_PAGE'],
+            error_out=False)
+        employees = pagination.items
+        prev = None
+        if pagination.has_prev:
+            prev = url_for('employeelist', page=page - 1)
+        next = None
+        if pagination.has_next:
+            next = url_for('employeelist', page=page + 1)
+        return jsonify({
+            'employees': [employee.json() for employee in employees],
+            'prev': prev,
+            'next': next,
+            'Total count': pagination.total,
+            'Page count': current_app.config['REST_POSTS_PER_PAGE'],
+        })

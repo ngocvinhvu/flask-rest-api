@@ -6,10 +6,7 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
-    REST_POSTS_PER_PAGE = 20
-    REST_FOLLOWERS_PER_PAGE = 50
-    REST_COMMENTS_PER_PAGE = 30
-    REST_SLOW_DB_QUERY_TIME = 0.5
+    REST_POSTS_PER_PAGE = 25
 
     @staticmethod
     def init_app(app):

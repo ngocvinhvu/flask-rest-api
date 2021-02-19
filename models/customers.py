@@ -14,13 +14,11 @@ class CustomerModel(db.Model):
     state = db.Column(db.VARCHAR(50), nullable=True)
     postalCode = db.Column(db.VARCHAR(15), nullable=True)
     country = db.Column(db.VARCHAR(50), nullable=False)
-    salesRepEmployeeNumber = db.Column(db.Integer, db.ForeignKey('employees.employeeNumber'), index=True, nullable=True)
+    salesRepEmployeeNumber = db.Column(db.Integer, db.ForeignKey('employees.employeeNumber', ondelete="CASCADE"), index=True, nullable=True)
     creditLimit = db.Column(db.DECIMAL(10, 2), nullable=True)
 
-    order = db.relationship('OrderModel', lazy='dynamic')
-    payment = db.relationship('PaymentModel', backref="cycles",
-                              cascade="save-update, merge, "
-                                      "delete, delete-orphan")
+    order = db.relationship('OrderModel', backref="customers", lazy='dynamic', cascade="all, delete-orphan")
+    payment = db.relationship('PaymentModel', backref="customers", lazy='dynamic', cascade="all, delete-orphan")
 
     def __init__(self,
                  customerNumber,

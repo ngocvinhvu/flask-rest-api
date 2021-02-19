@@ -3,7 +3,7 @@ from db import db
 
 class PaymentModel(db.Model):
     __tablename__ = 'payments'
-    customerNumber = db.Column(db.Integer, db.ForeignKey('customers.customerNumber'), primary_key=True, nullable=False)
+    customerNumber = db.Column(db.Integer, db.ForeignKey('customers.customerNumber', ondelete="CASCADE"), primary_key=True, nullable=False)
     checkNumber = db.Column(db.VARCHAR(50), primary_key=True, nullable=False)
     paymentDate = db.Column(db.Date, nullable=False)
     amount = db.Column(db.DECIMAL(10, 2), nullable=False)

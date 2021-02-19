@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.productlines import ProductlineModel
+from flask import request, current_app, jsonify, url_for
 
 
 class Productlines(Resource):
@@ -57,12 +58,11 @@ class Productlines(Resource):
 
         productline = ProductlineModel.find_by_productLine(productLine)
 
-        if productline is None:
+        if productline:
+            productline.delete_from_db()
             productline = ProductlineModel(productLine, **data)
         else:
-            productline.textDescription = data['textDescription']
-            productline.htmlDescription = data['htmlDescription']
-            productline.image = data['image']
+            productline = ProductlineModel(productLine, **data)
 
         productline.save_to_db()
 
@@ -71,4 +71,21 @@ class Productlines(Resource):
 
 class ProductlineList(Resource):
     def get(self):
-        return {'Productlines': [productline.json() for productline in ProductlineModel.query.all()]}
+        page = request.args.get('page', 1, type=int)
+        pagination = ProductlineModel.query.paginate(
+            page, per_page=current_app.config['REST_POSTS_PER_PAGE'],
+            error_out=False)
+        productlines = pagination.items
+        prev = None
+        if pagination.has_prev:
+            prev = url_for('productlinelist', page=page - 1)
+        next = None
+        if pagination.has_next:
+            next = url_for('productlinelist', page=page + 1)
+        return jsonify({
+            'productlines': [productline.json() for productline in productlines],
+            'prev': prev,
+            'next': next,
+            'Total count': pagination.total,
+            'Page count': current_app.config['REST_POSTS_PER_PAGE'],
+        })

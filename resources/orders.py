@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.orders import OrderModel
+from flask import request, current_app, jsonify, url_for
 
 
 class Orders(Resource):
@@ -71,15 +72,11 @@ class Orders(Resource):
 
         order = OrderModel.find_by_orderNumber(orderNumber)
 
-        if order is None:
+        if order:
+            order.delete_from_db()
             order = OrderModel(orderNumber, **data)
         else:
-            order.orderDate = data['orderDate']
-            order.requiredDate = data['requiredDate']
-            order.shippedDate = data['shippedDate']
-            order.status = data['status']
-            order.comments = data['comments']
-            order.orderNumber = data['orderNumber']
+            order = OrderModel(orderNumber, **data)
 
         order.save_to_db()
 
@@ -88,4 +85,21 @@ class Orders(Resource):
 
 class OrderList(Resource):
     def get(self):
-        return {'Orders': [order.json() for order in OrderModel.query.all()]}
+        page = request.args.get('page', 1, type=int)
+        pagination = OrderModel.query.paginate(
+            page, per_page=current_app.config['REST_POSTS_PER_PAGE'],
+            error_out=False)
+        orders = pagination.items
+        prev = None
+        if pagination.has_prev:
+            prev = url_for('orderlist', page=page - 1)
+        next = None
+        if pagination.has_next:
+            next = url_for('orderlist', page=page + 1)
+        return jsonify({
+            'orders': [order.json() for order in orders],
+            'prev': prev,
+            'next': next,
+            'Total count': pagination.total,
+            'Page count': current_app.config['REST_POSTS_PER_PAGE'],
+        })

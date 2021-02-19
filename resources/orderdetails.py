@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.orderdetails import OrderdetailModel
+from flask import request, current_app, jsonify, url_for
 
 
 class Orderdetails(Resource):
@@ -87,4 +88,21 @@ class Orderdetails(Resource):
 
 class OrderdetailList(Resource):
     def get(self):
-        return {'Orderdetails': [orderdetail.json() for orderdetail in OrderdetailModel.query.all()]}
+        page = request.args.get('page', 1, type=int)
+        pagination = OrderdetailModel.query.paginate(
+            page, per_page=current_app.config['REST_POSTS_PER_PAGE'],
+            error_out=False)
+        orderdetails = pagination.items
+        prev = None
+        if pagination.has_prev:
+            prev = url_for('orderdetaillist', page=page - 1)
+        next = None
+        if pagination.has_next:
+            next = url_for('orderdetaillist', page=page + 1)
+        return jsonify({
+            'orderdetails': [orderdetail.json() for orderdetail in orderdetails],
+            'prev': prev,
+            'next': next,
+            'Total count': pagination.total,
+            'Page count': current_app.config['REST_POSTS_PER_PAGE'],
+        })

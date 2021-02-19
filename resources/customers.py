@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.customers import CustomerModel
+from flask import request, current_app, jsonify, url_for
 
 
 class Customers(Resource):
@@ -96,42 +97,6 @@ class Customers(Resource):
             return {'message': 'customer deleted'}
         return {'message': 'Item not found.'}, 404
 
-    def patch(self, customerNumber):
-        data = Customers.parser.parse_args()
-
-        customer = CustomerModel.find_by_customerNumber(customerNumber)
-
-        if customer is None:
-            return {'message': 'Customer not found.'}, 404
-        else:
-            if 'customerName' in data and customer.customerName != data['customerName']:
-                customer.customerName = data['customerName']
-            if 'contactLastName' in data and customer.contactLastName != data['contactLastName']:
-                customer.contactLastName = data['contactLastName']
-            if 'contactFirstName' in data and customer.contactFirstName != data['contactFirstName']:
-                customer.contactFirstName = data['contactFirstName']
-            if 'phone' in data and customer.phone != data['phone']:
-                customer.phone = data['phone']
-            if 'addressLine1' in data and customer.addressLine1 != data['addressLine1']:
-                customer.addressLine1 = data['addressLine1']
-            if 'addressLine2' in data and customer.addressLine2 != data['addressLine2']:
-                customer.addressLine2 = data['addressLine2']
-            if 'city' in data and customer.city != data['city']:
-                customer.city = data['city']
-            if 'state' in data and customer.state != data['state']:
-                customer.state = data['state']
-            if 'postalCode' in data and customer.postalCode != data['postalCode']:
-                customer.postalCode = data['postalCode']
-            if 'country' in data and customer.country != data['country']:
-                customer.country = data['country']
-            if 'salesRepEmployeeNumber' in data and customer.salesRepEmployeeNumber != data['salesRepEmployeeNumber']:
-                customer.salesRepEmployeeNumber = data['salesRepEmployeeNumber']
-            if 'creditLimit' in data and customer.creditLimit != data['creditLimit']:
-                customer.creditLimit = data['creditLimit']
-        customer.save_to_db()
-
-        return {"message": "customer updated successful."}
-
     def put(self, customerNumber):
         data = Customers.parser.parse_args()
 
@@ -150,4 +115,21 @@ class Customers(Resource):
 
 class CustomerList(Resource):
     def get(self):
-        return {'Customers': [customer.json() for customer in CustomerModel.query.all()]}
+        page = request.args.get('page', 1, type=int)
+        pagination = CustomerModel.query.paginate(
+            page, per_page=current_app.config['REST_POSTS_PER_PAGE'],
+            error_out=False)
+        customers = pagination.items
+        prev = None
+        if pagination.has_prev:
+            prev = url_for('customerlist', page=page - 1)
+        next = None
+        if pagination.has_next:
+            next = url_for('customerlist', page=page + 1)
+        return jsonify({
+            'customers': [customer.json() for customer in customers],
+            'prev': prev,
+            'next': next,
+            'Total count': pagination.total,
+            'Page count': current_app.config['REST_POSTS_PER_PAGE'],
+        })

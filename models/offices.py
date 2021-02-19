@@ -13,7 +13,7 @@ class OfficeModel(db.Model):
     postalCode = db.Column(db.VARCHAR(15), nullable=False)
     territory = db.Column(db.VARCHAR(10), nullable=False)
 
-    employee = db.relationship('EmployeeModel', lazy='dynamic')
+    employee = db.relationship('EmployeeModel', backref='offices', lazy='dynamic', cascade="all, delete-orphan")
 
     def __init__(self,
                  officeCode,

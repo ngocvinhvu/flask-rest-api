@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.products import ProductModel
+from flask import request, current_app, jsonify, url_for
 
 
 class Products(Resource):
@@ -88,17 +89,11 @@ class Products(Resource):
 
         product = ProductModel.find_by_productCode(productCode)
 
-        if product is None:
+        if product:
+            product.delete_from_db()
             product = ProductModel(productCode, **data)
         else:
-            product.productName = data['productName']
-            product.productLine = data['productLine']
-            product.productScale = data['productScale']
-            product.productVendor = data['productVendor']
-            product.productDescription = data['productDescription']
-            product.quantityInStock = data['quantityInStock']
-            product.buyPrice = data['buyPrice']
-            product.MSRP = data['MSRP']
+            product = ProductModel(productCode, **data)
 
         product.save_to_db()
 
@@ -107,4 +102,21 @@ class Products(Resource):
 
 class ProductList(Resource):
     def get(self):
-        return {'Products': [product.json() for product in ProductModel.query.all()]}
+        page = request.args.get('page', 1, type=int)
+        pagination = ProductModel.query.paginate(
+            page, per_page=current_app.config['REST_POSTS_PER_PAGE'],
+            error_out=False)
+        products = pagination.items
+        prev = None
+        if pagination.has_prev:
+            prev = url_for('productlist', page=page - 1)
+        next = None
+        if pagination.has_next:
+            next = url_for('productlist', page=page + 1)
+        return jsonify({
+            'products': [product.json() for product in products],
+            'prev': prev,
+            'next': next,
+            'Total count': pagination.total,
+            'Page count': current_app.config['REST_POSTS_PER_PAGE'],
+        })

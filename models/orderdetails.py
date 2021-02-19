@@ -3,8 +3,8 @@ from db import db
 
 class OrderdetailModel(db.Model):
     __tablename__ = 'orderdetails'
-    orderNumber = db.Column(db.Integer, db.ForeignKey('orders.orderNumber'), primary_key=True, nullable=False)
-    productCode = db.Column(db.VARCHAR(15), db.ForeignKey('products.productCode'), primary_key=True, index=True, nullable=False)
+    orderNumber = db.Column(db.Integer, db.ForeignKey('orders.orderNumber', ondelete="CASCADE"), primary_key=True, nullable=False)
+    productCode = db.Column(db.VARCHAR(15), db.ForeignKey('products.productCode', ondelete="CASCADE"), primary_key=True, index=True, nullable=False)
     quantityOrdered = db.Column(db.Integer, nullable=False)
     priceEach = db.Column(db.DECIMAL(10, 2), nullable=False)
     orderLineNumber = db.Column(db.SMALLINT, nullable=False)

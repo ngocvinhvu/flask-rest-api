@@ -8,22 +8,22 @@ class EmployeeModel(db.Model):
     firstName = db.Column(db.VARCHAR(50), nullable=False)
     extension = db.Column(db.VARCHAR(10), nullable=False)
     email = db.Column(db.VARCHAR(100), nullable=False)
-    officeCode = db.Column(db.VARCHAR(10), db.ForeignKey('offices.officeCode'), index=True, nullable=False)
-    reportsTo = db.Column(db.Integer, db.ForeignKey('employees.employeeNumber'), nullable=True, index=True)
+    officeCode = db.Column(db.VARCHAR(10), db.ForeignKey('offices.officeCode', ondelete="CASCADE"), index=True, nullable=False)
+    reportsTo = db.Column(db.Integer, db.ForeignKey('employees.employeeNumber', ondelete="CASCADE|SET NULL"), nullable=True, index=True)
     jobTitle = db.Column(db.VARCHAR(50), nullable=False)
 
-    employee = db.relationship('EmployeeModel', lazy='dynamic')
+    employee = db.relationship("EmployeeModel", remote_side=[employeeNumber], cascade='all')
 
     def __init__(self,
-             employeeNumber,
-             lastName,
-             firstName,
-             extension,
-             email,
-             officeCode,
-             reportsTo,
-             jobTitle,
-            ):
+                 employeeNumber,
+                 lastName,
+                 firstName,
+                 extension,
+                 email,
+                 officeCode,
+                 reportsTo,
+                 jobTitle,
+                 ):
         self.employeeNumber = employeeNumber
         self.lastName = lastName
         self.firstName = firstName
@@ -52,11 +52,9 @@ class EmployeeModel(db.Model):
         ).first()
 
     def save_to_db(self):
-
         db.session.add(self)
         db.session.commit()
 
     def delete_from_db(self):
-
         db.session.delete(self)
         db.session.commit()

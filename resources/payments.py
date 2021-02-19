@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.payments import PaymentModel
+from flask import request, current_app, jsonify, url_for
 
 
 class Payments(Resource):
@@ -57,12 +58,11 @@ class Payments(Resource):
 
         payment = PaymentModel.find_by_customerNumber(customerNumber)
 
-        if payment is None:
+        if payment:
+            payment.delete_from_db()
             payment = PaymentModel(customerNumber, **data)
         else:
-            payment.checkNumber = data['checkNumber']
-            payment.paymentDate = data['paymentDate']
-            payment.amount = data['amount']
+            payment = PaymentModel(customerNumber, **data)
 
         payment.save_to_db()
 
@@ -71,4 +71,21 @@ class Payments(Resource):
 
 class PaymentList(Resource):
     def get(self):
-        return {'payments': [payment.json() for payment in PaymentModel.query.all()]}
+        page = request.args.get('page', 1, type=int)
+        pagination = PaymentModel.query.paginate(
+            page, per_page=current_app.config['REST_POSTS_PER_PAGE'],
+            error_out=False)
+        payments = pagination.items
+        prev = None
+        if pagination.has_prev:
+            prev = url_for('paymentlist', page=page - 1)
+        next = None
+        if pagination.has_next:
+            next = url_for('paymentlist', page=page + 1)
+        return jsonify({
+            'payments': [payment.json() for payment in payments],
+            'prev': prev,
+            'next': next,
+            'Total count': pagination.total,
+            'Page count': current_app.config['REST_POSTS_PER_PAGE'],
+        })

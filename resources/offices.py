@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.offices import OfficeModel
+from flask import request, current_app, jsonify, url_for
 
 
 class Offices(Resource):
@@ -83,17 +84,11 @@ class Offices(Resource):
 
         office = OfficeModel.find_by_officeCode(officeCode)
 
-        if office is None:
+        if office:
+            office.delete_from_db()
             office = OfficeModel(officeCode, **data)
         else:
-            office.city = data['city']
-            office.phone = data['phone']
-            office.addressLine1 = data['addressLine1']
-            office.addressLine2 = data['addressLine2']
-            office.state = data['state']
-            office.country = data['country']
-            office.postalCode = data['postalCode']
-            office.postalCode = data['territory']
+            office = OfficeModel(officeCode, **data)
 
         office.save_to_db()
 
@@ -102,4 +97,21 @@ class Offices(Resource):
 
 class OfficeList(Resource):
     def get(self):
-        return {'offices': list(map(lambda x: x.json(), OfficeModel.query.all()))}
+        page = request.args.get('page', 1, type=int)
+        pagination = OfficeModel.query.paginate(
+            page, per_page=current_app.config['REST_POSTS_PER_PAGE'],
+            error_out=False)
+        offices = pagination.items
+        prev = None
+        if pagination.has_prev:
+            prev = url_for('officelist', page=page - 1)
+        next = None
+        if pagination.has_next:
+            next = url_for('officelist', page=page + 1)
+        return jsonify({
+            'offices': [office.json() for office in offices],
+            'prev': prev,
+            'next': next,
+            'Total count': pagination.total,
+            'Page count': current_app.config['REST_POSTS_PER_PAGE'],
+        })
