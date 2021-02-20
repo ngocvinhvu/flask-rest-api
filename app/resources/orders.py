@@ -85,9 +85,19 @@ class Orders(Resource):
 
 class OrderList(Resource):
     def get(self):
+        query = request.args
+        orders_query = OrderModel.query
+        for k, v in query.items():
+            if k == 'sort':
+                orders_query = orders_query.order_by(v)
+            if k == 'customerNumber':
+                orders_query = orders_query.filter_by(customerNumber=v)
+            if k == 'orderNumber':
+                orders_query = orders_query.filter_by(orderNumber=v)
+
         page = request.args.get('page', 1, type=int)
         limit = request.args.get('limit', current_app.config['REST_POSTS_PER_PAGE'], type=int)
-        pagination = OrderModel.query.paginate(
+        pagination = orders_query.paginate(
             page, per_page=limit,
             error_out=False)
         orders = pagination.items

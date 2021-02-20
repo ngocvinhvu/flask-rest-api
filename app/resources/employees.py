@@ -92,9 +92,19 @@ class Employees(Resource):
 
 class EmployeeList(Resource):
     def get(self):
+        query = request.args
+        employees_query = EmployeeModel.query
+        for k, v in query.items():
+            if k == 'sort':
+                employees_query = employees_query.order_by(v)
+            if k == 'jobTitle':
+                employees_query = employees_query.filter_by(jobTitle=v)
+            if k == 'officeCode':
+                employees_query = employees_query.filter_by(officeCode=v)
+
         page = request.args.get('page', 1, type=int)
         limit = request.args.get('limit', current_app.config['REST_POSTS_PER_PAGE'], type=int)
-        pagination = EmployeeModel.query.paginate(
+        pagination = employees_query.paginate(
             page, per_page=limit,
             error_out=False)
         employees = pagination.items

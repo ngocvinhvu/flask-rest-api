@@ -102,9 +102,19 @@ class Products(Resource):
 
 class ProductList(Resource):
     def get(self):
+        query = request.args
+        products_query = ProductModel.query
+        for k, v in query.items():
+            if k == 'sort':
+                products_query = products_query.order_by(v)
+            if k == 'productCode':
+                products_query = products_query.filter_by(productCode=v)
+            if k == 'productLine':
+                products_query = products_query.filter_by(productLine=v)
+
         page = request.args.get('page', 1, type=int)
         limit = request.args.get('limit', current_app.config['REST_POSTS_PER_PAGE'], type=int)
-        pagination = ProductModel.query.paginate(
+        pagination = products_query.paginate(
             page, per_page=limit,
             error_out=False)
         products = pagination.items

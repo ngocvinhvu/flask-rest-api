@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
 from app.models.payments import PaymentModel
 from flask import request, current_app, jsonify, url_for
+from datetime import datetime
 
 
 class Payments(Resource):
@@ -13,7 +14,7 @@ class Payments(Resource):
                         )
 
     parser.add_argument('paymentDate',
-                        type=str,
+                        type=lambda d: datetime.strptime(d, '%Y-%m-%d').astimezone().replace(microsecond=0).isoformat(),
                         required=True,
                         help="This field cannot be left blank"
                         )
@@ -34,7 +35,7 @@ class Payments(Resource):
         if PaymentModel.find_by_customerNumber(customerNumber):
             return {'message': f'A payment with customerNumber: {customerNumber} already exists'}, 400
 
-        data = payments.parser.parse_args()
+        data = Payments.parser.parse_args()
 
         payment = PaymentModel(customerNumber, **data)
 
@@ -54,7 +55,7 @@ class Payments(Resource):
         return {'message': 'Item not found.'}, 404
 
     def put(self, customerNumber):
-        data = payments.parser.parse_args()
+        data = Payments.parser.parse_args()
 
         payment = PaymentModel.find_by_customerNumber(customerNumber)
 
@@ -71,9 +72,19 @@ class Payments(Resource):
 
 class PaymentList(Resource):
     def get(self):
+        query = request.args
+        payments_query = PaymentModel.query
+        for k, v in query.items():
+            if k == 'sort':
+                payments_query = payments_query.order_by(v)
+            if k == 'customerNumber':
+                payments_query = payments_query.filter_by(customerNumber=v)
+            if k == 'paymentDate':
+                payments_query = payments_query.filter_by(paymentDate=v)
+
         page = request.args.get('page', 1, type=int)
         limit = request.args.get('limit', current_app.config['REST_POSTS_PER_PAGE'], type=int)
-        pagination = PaymentModel.query.paginate(
+        pagination = payments_query.paginate(
             page, per_page=limit,
             error_out=False)
         payments = pagination.items

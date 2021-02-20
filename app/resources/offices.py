@@ -97,9 +97,19 @@ class Offices(Resource):
 
 class OfficeList(Resource):
     def get(self):
+        query = request.args
+        offices_query = OfficeModel.query
+        for k, v in query.items():
+            if k == 'sort':
+                offices_query = offices_query.order_by(v)
+            if k == 'country':
+                offices_query = offices_query.filter_by(country=v)
+            if k == 'city':
+                offices_query = offices_query.filter_by(city=v)
+
         page = request.args.get('page', 1, type=int)
         limit = request.args.get('limit', current_app.config['REST_POSTS_PER_PAGE'], type=int)
-        pagination = OfficeModel.query.paginate(
+        pagination = offices_query.paginate(
             page, per_page=limit,
             error_out=False)
         offices = pagination.items

@@ -115,9 +115,19 @@ class Customers(Resource):
 
 class CustomerList(Resource):
     def get(self):
+        query = request.args
+        customers_query = CustomerModel.query
+        for k, v in query.items():
+            if k == 'sort':
+                customers_query = customers_query.order_by(v)
+            if k == 'country':
+                customers_query = customers_query.filter_by(country=v)
+            if k == 'customerNumber':
+                customers_query = customers_query.filter_by(customerNumber=v)
+
         page = request.args.get('page', 1, type=int)
         limit = request.args.get('limit', current_app.config['REST_POSTS_PER_PAGE'], type=int)
-        pagination = CustomerModel.query.paginate(
+        pagination = customers_query.paginate(
             page, per_page=limit,
             error_out=False)
         customers = pagination.items
@@ -132,5 +142,5 @@ class CustomerList(Resource):
             'prev': prev,
             'next': next,
             'Total count': pagination.total,
-            'Page count': limit,
+            'Page limit': limit,
         })
