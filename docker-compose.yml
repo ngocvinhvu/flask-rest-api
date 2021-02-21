@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+
+  flask:
+    build: .
+    container_name: flask
+    restart: always
+    env_file: .env
+    expose:
+      - 8080
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+
+  my-mysql:
+    build: ./db
+    restart: always
+    environment:
+      - MYSQL_USER=tris
+      - MYSQL_PASSWORD=qwerty12345
