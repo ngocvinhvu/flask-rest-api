@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.3"
 
 services:
 
@@ -18,8 +18,14 @@ services:
       - "80:80"
 
   my-mysql:
-    build: ./db
+    image: "mysql/mysql-server:5.7"
     restart: always
-    environment:
-      - MYSQL_USER=tris
-      - MYSQL_PASSWORD=qwerty12345
+    env_file: ./db/.env-mysql
+    volumes:
+      - ${PWD}/db/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
