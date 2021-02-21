@@ -18,14 +18,8 @@ services:
       - "80:80"
 
   my-mysql:
-    image: "mysql/mysql-server:5.7"
+    image: "mysql:latest"
     restart: always
     env_file: ./db/.env-mysql
     volumes:
-      - ${PWD}/db/setup.sql:/docker-entrypoint-initdb.d/setup.sql
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
+      - ./db/setup.sql:/docker-entrypoint-initdb.d/setup.sql
