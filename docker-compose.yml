@@ -20,6 +20,6 @@ services:
   my-mysql:
     image: "mysql:latest"
     restart: always
-    env_file: ./db/.env-mysql
+    env_file: .env-mysql
     volumes:
-      - ./db/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+      - ./db:/docker-entrypoint-initdb.d
