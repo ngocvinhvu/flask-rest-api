@@ -51,9 +51,12 @@ class Offices(Resource):
                         )
 
     def get(self, officeCode):
-        office = OfficeModel.find_by_officeCode(officeCode)
-        if office:
-            return office.json()
+        offices = OfficeModel.find_by_officeCode(officeCode)
+        if offices:
+            try:
+                return jsonify({'offices': [office.json() for office in offices]})
+            except:
+                return offices.json()
         return {'message': 'office not found'}, 404
 
     def post(self, officeCode):
@@ -124,5 +127,5 @@ class OfficeList(Resource):
             'prev': prev,
             'next': next,
             'Total count': pagination.total,
-            'Page count': limit,
+            'Page limit': limit,
         })

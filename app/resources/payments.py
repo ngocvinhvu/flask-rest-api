@@ -26,9 +26,12 @@ class Payments(Resource):
                         )
 
     def get(self, customerNumber):
-        payment = PaymentModel.find_by_customerNumber(customerNumber)
-        if payment:
-            return payment.json()
+        payments = PaymentModel.find_by_customerNumber(customerNumber)
+        if payments:
+            try:
+                return jsonify({'payments': [payment.json() for payment in payments]})
+            except:
+                return payments.json()
         return {'message': 'payment not found'}, 404
 
     def post(self, customerNumber):
@@ -99,5 +102,5 @@ class PaymentList(Resource):
             'prev': prev,
             'next': next,
             'Total count': pagination.total,
-            'Page count': limit,
+            'Page limit': limit,
         })

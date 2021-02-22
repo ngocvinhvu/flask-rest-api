@@ -55,10 +55,12 @@ class Products(Resource):
                         )
 
     def get(self, productCode):
-        print(productCode)
-        product = ProductModel.find_by_productCode(productCode)
-        if product:
-            return product.json()
+        products = ProductModel.find_by_productCode(productCode)
+        if products:
+            try:
+                return jsonify({'products': [product.json() for product in products]})
+            except:
+                return products.json()
         return {'message': 'product not found'}, 404
 
     def post(self, productCode):
@@ -129,5 +131,5 @@ class ProductList(Resource):
             'prev': prev,
             'next': next,
             'Total count': pagination.total,
-            'Page count': limit,
+            'Page limit': limit,
         })

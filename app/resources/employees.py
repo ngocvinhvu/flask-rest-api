@@ -47,9 +47,12 @@ class Employees(Resource):
                         )
 
     def get(self, employeeNumber):
-        employee = EmployeeModel.find_by_employeeNumber(employeeNumber)
-        if employee:
-            return employee.json()
+        employees = EmployeeModel.find_by_employeeNumber(employeeNumber)
+        if employees:
+            try:
+                return jsonify({'employees': [employee.json() for employee in employees]})
+            except:
+                return employees.json()
         return {'message': 'employee not found'}, 404
 
     def post(self, employeeNumber):
@@ -119,5 +122,5 @@ class EmployeeList(Resource):
             'prev': prev,
             'next': next,
             'Total count': pagination.total,
-            'Page count': limit,
+            'Page limit': limit,
         })

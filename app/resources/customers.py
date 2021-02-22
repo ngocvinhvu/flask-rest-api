@@ -69,9 +69,12 @@ class Customers(Resource):
                         )
 
     def get(self, customerNumber):
-        customer = CustomerModel.find_by_customerNumber(customerNumber)
-        if customer:
-            return customer.json()
+        customers = CustomerModel.find_by_customerNumber(customerNumber)
+        if customers:
+            try:
+                return jsonify({'customers': [customer.json() for customer in customers]})
+            except:
+                return customers.json()
         return {'message': 'customer not found'}, 404
 
     def post(self, customerNumber):

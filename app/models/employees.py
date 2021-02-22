@@ -9,10 +9,10 @@ class EmployeeModel(db.Model):
     extension = db.Column(db.VARCHAR(10), nullable=False)
     email = db.Column(db.VARCHAR(100), nullable=False)
     officeCode = db.Column(db.VARCHAR(10), db.ForeignKey('offices.officeCode', ondelete="CASCADE"), index=True, nullable=False)
-    reportsTo = db.Column(db.Integer, db.ForeignKey('employees.employeeNumber', ondelete="CASCADE|SET NULL"), nullable=True, index=True)
+    reportsTo = db.Column(db.Integer, db.ForeignKey('employees.employeeNumber', ondelete="CASCADE"), nullable=True, index=True)
     jobTitle = db.Column(db.VARCHAR(50), nullable=False)
 
-    employee = db.relationship("EmployeeModel", remote_side=[employeeNumber], cascade='all')
+    employee = db.relationship("EmployeeModel", remote_side=[employeeNumber], cascade='all, delete-orphan', single_parent=True)
 
     def __init__(self,
                  employeeNumber,

@@ -25,9 +25,12 @@ class Productlines(Resource):
                         )
 
     def get(self, productLine):
-        productline = ProductlineModel.find_by_productLine(productLine)
-        if productline:
-            return productline.json()
+        productlines = ProductlineModel.find_by_productLine(productLine)
+        if productlines:
+            try:
+                return jsonify({'productlines': [productline.json() for productline in productlines]})
+            except:
+                return productlines.json()
         return {'message': 'productline not found'}, 404
 
     def post(self, productLine):
@@ -96,5 +99,5 @@ class ProductlineList(Resource):
             'prev': prev,
             'next': next,
             'Total count': pagination.total,
-            'Page count': limit,
+            'Page limit': limit,
         })

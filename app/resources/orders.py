@@ -39,9 +39,12 @@ class Orders(Resource):
                         )
 
     def get(self, orderNumber):
-        order = OrderModel.find_by_orderNumber(orderNumber)
-        if order:
-            return order.json()
+        orders = OrderModel.find_by_orderNumber(orderNumber)
+        if orders:
+            try:
+                return jsonify({'orders': [order.json() for order in orders]})
+            except:
+                return orders.json()
         return {'message': 'order not found'}, 404
 
     def post(self, orderNumber):
@@ -112,5 +115,5 @@ class OrderList(Resource):
             'prev': prev,
             'next': next,
             'Total count': pagination.total,
-            'Page count': limit,
+            'Page limit': limit,
         })

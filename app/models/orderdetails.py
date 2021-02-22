@@ -35,13 +35,13 @@ class OrderdetailModel(db.Model):
     def find_by_orderNumber(cls, orderNumber):
         return cls.query.filter_by(
             orderNumber=orderNumber
-        ).first()
+        ).all()
 
     @classmethod
     def find_by_productCode(cls, productCode):
         return cls.query.filter_by(
             productCode=productCode
-        ).first()
+        ).all()
 
     def save_to_db(self):
 

@@ -25,13 +25,19 @@ class Orderdetails(Resource):
                         )
 
     def get(self, orderdetailkey):
-        orderdetail = OrderdetailModel.find_by_orderNumber(orderdetailkey)
-        if orderdetail:
-            return orderdetail.json()
+        orderdetails = OrderdetailModel.find_by_orderNumber(orderdetailkey)
+        if orderdetails:
+            try:
+                return jsonify({'items': [orderdetail.json() for orderdetail in orderdetails]})
+            except:
+                return orderdetail.json()
         else:
-            orderdetail = OrderdetailModel.find_by_productCode(orderdetailkey)
-            if orderdetail:
-                return  orderdetail.json()
+            orderdetails = OrderdetailModel.find_by_productCode(orderdetailkey)
+            if orderdetails:
+                try:
+                    return jsonify({'items': [orderdetail.json() for orderdetail in orderdetails]})
+                except:
+                    return orderdetail.json()
             else:
                 return {'message': 'orderdetail not found'}, 404
 
@@ -115,5 +121,5 @@ class OrderdetailList(Resource):
             'prev': prev,
             'next': next,
             'Total count': pagination.total,
-            'Page count': limit,
+            'Page limit': limit,
         })
