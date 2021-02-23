@@ -15,10 +15,10 @@ Link: http://107.178.212.44
 
 ## GET list of data
 - /api/v1/customers # filter_by: country, customerNumber # sort_by any field
-- /api/v1/employees # filter_by: firstName, reportsTo # sort_by any field
-- /api/v1/offices # filter_by: city, phone # sort_by any field
-- /api/v1/orderdetails # filter_by: productCode, quantityOrdered # sort_by any field
-- /api/v1/orders # filter_by: orderDate, requiredDate # sort_by any field
-- /api/v1/payments # filter_by: paymentDate, checkNumber # sort_by any field
-- /api/v1/productlines # filter_by: textDescription, htmlDescription # sort_by any field
-- /api/v1/products # filter_by: productName, productLine # sort_by any field
+- /api/v1/employees # filter_by: jobTitle, officeCode # sort_by any field
+- /api/v1/offices # filter_by: country, city # sort_by any field
+- /api/v1/orderdetails # filter_by: quantityOrdered, orderNumber # sort_by any field
+- /api/v1/orders # filter_by: customerNumber, orderNumber # sort_by any field
+- /api/v1/payments # filter_by: customerNumber, paymentDate # sort_by any field
+- /api/v1/productlines # filter_by: productLine # sort_by any field
+- /api/v1/products # filter_by: productCode, productLine # sort_by any field
