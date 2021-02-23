@@ -22,7 +22,3 @@ Link: http://107.178.212.44
 - /api/v1/payments # filter_by: customerNumber, paymentDate # sort_by any field
 - /api/v1/productlines # filter_by: productLine # sort_by any field
 - /api/v1/products # filter_by: productCode, productLine # sort_by any field
-<<<<<<< HEAD
-
-=======
->>>>>>> ce78fa5d7e67052f608619c06cd3c3369de85faf
