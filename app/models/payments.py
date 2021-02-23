@@ -34,7 +34,7 @@ class PaymentModel(db.Model):
     def find_by_customerNumber(cls, customerNumber):
         return cls.query.filter_by(
             customerNumber=customerNumber
-        ).first()
+        ).all()
 
     def save_to_db(self):
         db.session.add(self)
