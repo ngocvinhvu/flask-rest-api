@@ -3,6 +3,8 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from config import config
 from flask_restful.utils import cors
+from flask_jwt_extended import JWTManager
+from . import login
 
 db = SQLAlchemy()
 
@@ -14,6 +16,7 @@ def create_app(config_name):
     api = Api(app)
     db.init_app(app)
     api.decorators = [cors.crossdomain(origin='*')]
+    jwt = JWTManager(app)
 
     from app.resources import Customers, CustomerList
     from app.resources import Employees, EmployeeList
@@ -23,6 +26,7 @@ def create_app(config_name):
     from app.resources import Payments, PaymentList
     from app.resources import Productlines, ProductlineList
     from app.resources import Products, ProductList
+    from app.login import UserLogin
 
     @app.route('/')
     def index():
@@ -51,5 +55,7 @@ def create_app(config_name):
 
     api.add_resource(Products, '/api/v1/product/<string:productCode>')
     api.add_resource(ProductList, '/api/v1/products', endpoint='productlist')
+
+    api.add_resource(UserLogin, '/login')
 
     return app

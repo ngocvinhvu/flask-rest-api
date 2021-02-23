@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
 from app.models.productlines import ProductlineModel
 from flask import request, current_app, jsonify, url_for
+from flask_jwt_extended import jwt_required
 
 
 class Productlines(Resource):
@@ -24,6 +25,7 @@ class Productlines(Resource):
                         help="This field cannot be left blank!"
                         )
 
+    @jwt_required()
     def get(self, productLine):
         productlines = ProductlineModel.find_by_productLine(productLine)
         if productlines:
@@ -73,6 +75,7 @@ class Productlines(Resource):
 
 
 class ProductlineList(Resource):
+    @jwt_required()
     def get(self):
         query = request.args
         productlines_query = ProductlineModel.query
